@@ -21,4 +21,5 @@ const classSchema = new mongoose_1.default.Schema({
     },
     students: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: "User" }],
 });
-mongoose_1.default.model("Class", classSchema);
+const Class = mongoose_1.default.model("Class", classSchema);
+exports.default = Class;

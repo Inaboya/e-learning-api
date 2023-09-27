@@ -12,19 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// const express = require("express");
-// const mongoose = require("mongoose");
-// const jwt = require("jsonwebtoken");
-// const User = mongoose.model("User");
-// const Class = mongoose.model("Class");
-// const requireAuth = require("../middleware/requireAuth");
 const express_1 = __importDefault(require("express"));
-const User_1 = __importDefault(require("../models/User"));
-const Class_1 = __importDefault(require("../models/Class"));
-const requireAuth_1 = __importDefault(require("../middleware/requireAuth"));
+const User_1 = __importDefault(require("../model/User"));
+const Class_1 = __importDefault(require("../model/Class"));
+const requiresAuth_1 = __importDefault(require("../middleware/requiresAuth"));
 const router = express_1.default.Router();
 ////////////////        ADD TEACHER / STUDENT / HEAD        /////////////////
-router.post("/user/create", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/user/create", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, profileImage, phoneNumber, userType } = req.body;
     if (req.user.userType !== "admin") {
         return res.status(422).send({ error: "Access Denied" });
@@ -52,7 +46,7 @@ router.post("/user/create", requireAuth_1.default, (req, res) => __awaiter(void 
     }
 }));
 ////////////////        GET USERS / DASHOBOARD       /////////////////
-router.get("/users", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/users", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let filters = {};
         let usersListing = yield User_1.default.find(filters);
@@ -67,7 +61,7 @@ router.get("/users", requireAuth_1.default, (req, res) => __awaiter(void 0, void
     }
 }));
 ////////////////        GET USER       /////////////////
-router.get("/user/:id", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/user/:id", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     try {
         let user = yield User_1.default.findOne({ _id: id });
@@ -81,7 +75,7 @@ router.get("/user/:id", requireAuth_1.default, (req, res) => __awaiter(void 0, v
     }
 }));
 ////////////////        EDIT USER / DASHOBOARD       /////////////////
-router.patch("/user/:id", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch("/user/:id", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const updates = req.body;
     try {
@@ -93,7 +87,7 @@ router.patch("/user/:id", requireAuth_1.default, (req, res) => __awaiter(void 0,
     }
 }));
 ////////////////        UPLOAD USER IMAGE       /////////////////
-router.patch("/user/uploadImage/:id", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch("/user/uploadImage/:id", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const updates = req.body;
     try {
@@ -105,7 +99,7 @@ router.patch("/user/uploadImage/:id", requireAuth_1.default, (req, res) => __awa
     }
 }));
 ////////////////        DELETE USER / DASHOBOARD       /////////////////
-router.delete("/user/:id", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete("/user/:id", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     if (req.user.userType !== "admin") {
         return res.status(422).send({ error: "Only admin can use this facility" });
@@ -119,7 +113,7 @@ router.delete("/user/:id", requireAuth_1.default, (req, res) => __awaiter(void 0
     }
 }));
 ////////////////        ADD CLASS        /////////////////
-router.post("/class/create", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/class/create", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { className, classCode, teacherId, subject } = req.body;
     const students = [];
     if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
@@ -144,7 +138,7 @@ router.post("/class/create", requireAuth_1.default, (req, res) => __awaiter(void
     }
 }));
 ////////////////        GET CLASSES        /////////////////
-router.get("/classes", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/classes", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
         return res.status(422).send({ error: "Access Denied" });
     }
@@ -162,7 +156,7 @@ router.get("/classes", requireAuth_1.default, (req, res) => __awaiter(void 0, vo
     }
 }));
 ////////////////        ADD STUDENT TO CLASS        /////////////////
-router.patch("/student/add", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch("/student/add", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { studentId, classId } = req.body;
     if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
         return res.status(422).send({ error: "Access Denied" });
@@ -177,7 +171,7 @@ router.patch("/student/add", requireAuth_1.default, (req, res) => __awaiter(void
     }
 }));
 ////////////////        ASSIGN TEACHER TO CLASS        /////////////////
-router.patch("/teacher/assign", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch("/teacher/assign", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { teacherId, classId } = req.body;
     if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
         return res.status(422).send({ error: "Access Denied" });
@@ -192,7 +186,7 @@ router.patch("/teacher/assign", requireAuth_1.default, (req, res) => __awaiter(v
     }
 }));
 ////////////////        GET CLASS DETAILS        /////////////////
-router.get("/class/:id", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/class/:id", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
         return res.status(422).send({ error: "Access Denied" });
@@ -207,7 +201,7 @@ router.get("/class/:id", requireAuth_1.default, (req, res) => __awaiter(void 0, 
     }
 }));
 ////////////////        EDIT CLASS       /////////////////
-router.patch("/class/:id", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch("/class/:id", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const updates = req.body;
     try {
@@ -219,7 +213,7 @@ router.patch("/class/:id", requireAuth_1.default, (req, res) => __awaiter(void 0
     }
 }));
 ////////////////        DELETE CLASS       /////////////////
-router.delete("/class/:id", requireAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete("/class/:id", requiresAuth_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     if (req.user.userType !== "admin") {
         return res.status(422).send({ error: "Access Denied" });

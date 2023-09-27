@@ -1,50 +1,49 @@
-// const express = require("express");
-// const mongoose = require("mongoose");
-// const jwt = require("jsonwebtoken");
-// const User = mongoose.model("User");
-// const Class = mongoose.model("Class");
-// const requireAuth = require("../middleware/requireAuth");
 import express, { Request, Response } from "express";
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
-import User from "../models/User";
-import Class from "../models/Class";
-import requireAuth from "../middleware/requireAuth";
+import User from "../model/User";
+import Class from "../model/Class";
+import requireAuth from "../middleware/requiresAuth";
+import { CustomRequest } from "../utils/";
 
 const router = express.Router();
 
 ////////////////        ADD TEACHER / STUDENT / HEAD        /////////////////
 
-router.post("/user/create", requireAuth, async (req: Request, res: Response) => {
-  const { name, email, profileImage, phoneNumber, userType } = req.body;
-  if (req.user.userType !== "admin") {
-    return res.status(422).send({ error: "Access Denied" });
-  }
+router.post(
+  "/user/create",
+  requireAuth,
+  async (req: CustomRequest, res: Response) => {
+    const { name, email, profileImage, phoneNumber, userType } = req.body;
+    if (req.user.userType !== "admin") {
+      return res.status(422).send({ error: "Access Denied" });
+    }
 
-  const regEx =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  if (!email.match(regEx)) {
-    return res.status(422).json({ error: "Must provide valid email" });
-  }
+    const regEx =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!email.match(regEx)) {
+      return res.status(422).json({ error: "Must provide valid email" });
+    }
 
-  try {
-    const user = new User({
-      name,
-      email,
-      phoneNumber,
-      profileImage,
-      userType,
-    });
-    await user.save();
+    try {
+      const user = new User({
+        name,
+        email,
+        phoneNumber,
+        profileImage,
+        userType,
+      });
+      await user.save();
 
-    res.send({
-      user,
-    });
-  } catch (err) {
-    console.log(err);
-    return res.status(422).json({ error: err.message });
+      res.send({
+        user,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(422).json({ error: err.message });
+    }
   }
-});
+);
 
 ////////////////        GET USERS / DASHOBOARD       /////////////////
 
@@ -94,16 +93,20 @@ router.patch("/user/:id", requireAuth, async (req: Request, res: Response) => {
 
 ////////////////        UPLOAD USER IMAGE       /////////////////
 
-router.patch("/user/uploadImage/:id", requireAuth, async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const updates = req.body;
-  try {
-    const result = await User.findByIdAndUpdate(id, updates, { new: true });
-    res.send(result);
-  } catch (err) {
-    return res.status(422).send(err.message);
+router.patch(
+  "/user/uploadImage/:id",
+  requireAuth,
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const updates = req.body;
+    try {
+      const result = await User.findByIdAndUpdate(id, updates, { new: true });
+      res.send(result);
+    } catch (err) {
+      return res.status(422).send(err.message);
+    }
   }
-});
+);
 
 ////////////////        DELETE USER / DASHOBOARD       /////////////////
 
@@ -124,32 +127,36 @@ router.delete("/user/:id", requireAuth, async (req: Request, res: Response) => {
 
 ////////////////        ADD CLASS        /////////////////
 
-router.post("/class/create", requireAuth, async (req: Request, res: Response) => {
-  const { className, classCode, teacherId, subject } = req.body;
-  const students = [];
+router.post(
+  "/class/create",
+  requireAuth,
+  async (req: Request, res: Response) => {
+    const { className, classCode, teacherId, subject } = req.body;
+    const students = [];
 
-  if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
-    return res.status(422).send({ error: "Access Denied" });
+    if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
+      return res.status(422).send({ error: "Access Denied" });
+    }
+
+    try {
+      const newClass = new Class({
+        className,
+        classCode,
+        teacherId,
+        subject,
+        students,
+      });
+      await newClass.save();
+
+      res.send({
+        class: newClass,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(422).json({ error: err.message });
+    }
   }
-
-  try {
-    const newClass = new Class({
-      className,
-      classCode,
-      teacherId,
-      subject,
-      students,
-    });
-    await newClass.save();
-
-    res.send({
-      class: newClass,
-    });
-  } catch (err) {
-    console.log(err);
-    return res.status(422).json({ error: err.message });
-  }
-});
+);
 
 ////////////////        GET CLASSES        /////////////////
 
@@ -173,47 +180,55 @@ router.get("/classes", requireAuth, async (req: Request, res: Response) => {
 
 ////////////////        ADD STUDENT TO CLASS        /////////////////
 
-router.patch("/student/add", requireAuth, async (req: Request, res: Response) => {
-  const { studentId, classId } = req.body;
+router.patch(
+  "/student/add",
+  requireAuth,
+  async (req: Request, res: Response) => {
+    const { studentId, classId } = req.body;
 
-  if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
-    return res.status(422).send({ error: "Access Denied" });
-  }
+    if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
+      return res.status(422).send({ error: "Access Denied" });
+    }
 
-  try {
-    const result = await Class.updateOne(
-      { _id: classId },
-      { $push: { students: studentId } },
-      { new: true }
-    );
-    res.send(result);
-  } catch (err) {
-    console.log(err);
-    return res.status(422).json({ error: err.message });
+    try {
+      const result = await Class.updateOne(
+        { _id: classId },
+        { $push: { students: studentId } },
+        { new: true }
+      );
+      res.send(result);
+    } catch (err) {
+      console.log(err);
+      return res.status(422).json({ error: err.message });
+    }
   }
-});
+);
 
 ////////////////        ASSIGN TEACHER TO CLASS        /////////////////
 
-router.patch("/teacher/assign", requireAuth, async (req: Request, res: Response) => {
-  const { teacherId, classId } = req.body;
+router.patch(
+  "/teacher/assign",
+  requireAuth,
+  async (req: Request, res: Response) => {
+    const { teacherId, classId } = req.body;
 
-  if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
-    return res.status(422).send({ error: "Access Denied" });
-  }
+    if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
+      return res.status(422).send({ error: "Access Denied" });
+    }
 
-  try {
-    const result = await Class.findByIdAndUpdate(
-      { _id: classId },
-      { teacherId },
-      { new: true }
-    );
-    res.send(result);
-  } catch (err) {
-    console.log(err);
-    return res.status(422).json({ error: err.message });
+    try {
+      const result = await Class.findByIdAndUpdate(
+        { _id: classId },
+        { teacherId },
+        { new: true }
+      );
+      res.send(result);
+    } catch (err) {
+      console.log(err);
+      return res.status(422).json({ error: err.message });
+    }
   }
-});
+);
 
 ////////////////        GET CLASS DETAILS        /////////////////
 
@@ -248,19 +263,23 @@ router.patch("/class/:id", requireAuth, async (req: Request, res: Response) => {
 
 ////////////////        DELETE CLASS       /////////////////
 
-router.delete("/class/:id", requireAuth, async (req: Request, res: Response) => {
-  const id = req.params.id;
+router.delete(
+  "/class/:id",
+  requireAuth,
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
 
-  if (req.user.userType !== "admin") {
-    return res.status(422).send({ error: "Access Denied" });
-  }
+    if (req.user.userType !== "admin") {
+      return res.status(422).send({ error: "Access Denied" });
+    }
 
-  try {
-    await Class.deleteOne({ _id: id });
-    res.send({ message: "Class deleted Succesfully" });
-  } catch (err) {
-    return res.status(422).send(err.message);
+    try {
+      await Class.deleteOne({ _id: id });
+      res.send({ message: "Class deleted Succesfully" });
+    } catch (err) {
+      return res.status(422).send(err.message);
+    }
   }
-});
+);
 
 export default router;

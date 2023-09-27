@@ -18,4 +18,6 @@ const classSchema = new mongoose.Schema({
   students: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
-mongoose.model("Class", classSchema);
+const Class = mongoose.model("Class", classSchema);
+
+export default Class;

@@ -1,8 +1,7 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
-const User = mongoose.model("User");
-const requireAuth = require("../middleware/requireAuth");
+import express from "express";
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import User from "../model/User";
 
 const router = express.Router();
 
