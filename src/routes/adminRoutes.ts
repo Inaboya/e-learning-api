@@ -4,6 +4,8 @@ import {
   createClass,
   deleteClass,
   deleteUser,
+  getClassById,
+  getClasses,
   getUserById,
   getUsers,
   updateClass,

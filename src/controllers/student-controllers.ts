@@ -1,6 +1,6 @@
 import Quiz from "../model/Quiz";
 import { Request, Response} from "express"
-import { CustomRequests } from "../utils";
+import { CustomRequests } from "../utils/custom";
 
 
 export const quizAttempts = async (req: CustomRequests, res: Response) => {

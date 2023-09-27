@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../model/User";
 import Class from "../model/Class";
-import { CustomRequests } from "../utils/";
+// import { ExpressCustomRequests } from "../utils";
+import { CustomRequests } from "../utils/custom";
+
 
 export const userCreate =  async (req: CustomRequests, res: Response) => {
     const { name, email, profileImage, phoneNumber, userType } = req.body;

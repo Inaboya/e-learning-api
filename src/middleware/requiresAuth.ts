@@ -3,8 +3,10 @@
 // const User = mongoose.model('User');
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import User from "../model/User";
+import { CustomRequests } from "../utils/custom";
 
-export default (req: Request, res: Response, next: NextFunction) => {
+export default (req: CustomRequests, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
   // authorization === 'Bearer laksjdflaksdjasdfklj'
 
@@ -13,7 +15,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
   }
 
   const token = authorization.replace('Bearer ', '');
-  jwt.verify(token, 'MY_SECRET_KEY', async (err, payload) => {
+  jwt.verify(token, 'MY_SECRET_KEY', async (err, payload: any) => {
     if (err) {
       return res.status(401).send({ error: 'You must be logged in.' });
     }
