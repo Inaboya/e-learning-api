@@ -1,6 +1,3 @@
-require("./models/User");
-require("./models/Class");
-require("./models/Quiz");
 import { Request, Response} from "express";
 import express from "express";
 import mongoose from "mongoose";
@@ -35,12 +32,12 @@ mongoose.connect(mongoUri, {
 mongoose.connection.on("connected", () => {
   console.log("Connected to mongo instance");
 });
-mongoose.connection.on("error", (err) => {
+mongoose.connection.on("error", (err: any) => {
   console.error("Error connecting to mongo", err);
 });
 
-app.get("/", requireAuth, (req: Request, res: Response) => {
-  res.send(`Your email: ${req.user.email}`);
+app.get("/", (req: Request, res: Response) => {
+  res.send(`Server is live`);
 });
 
 app.listen(5000, () => {

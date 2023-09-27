@@ -1,6 +1,6 @@
 import { Request } from "express"
 
-export interface CustomRequest extends Request {
+export interface CustomRequests extends Request {
     user: {
         userType: string;
     }

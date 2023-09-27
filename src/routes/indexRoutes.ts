@@ -1,7 +1,8 @@
-const express = require("express");
-const router = express.Router();
+import { Request, Response, Router } from "express";
 
-router.get("/", async(req, res) => {
+const router = Router()
+
+router.get("/", async(req: Request, res: Response) => {
     return res.json({
         message: 'LMS Server is Running.'
     });

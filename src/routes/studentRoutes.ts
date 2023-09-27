@@ -1,33 +1,20 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
-const Class = mongoose.model("Class");
-const Quiz = mongoose.model("Quiz");
-const requireAuth = require("../middleware/requireAuth");
+// const express = require("express");
+// const mongoose = require("mongoose");
+// const jwt = require("jsonwebtoken");
+// const Class = mongoose.model("Class");
+// const Quiz = mongoose.model("Quiz");
+// const requireAuth = require("../middleware/requireAuth");
 
-const router = express.Router();
+// const router = express.Router();
+import { Router } from "express";
+import requiresAuth from "../middleware/requiresAuth";
+import { quizAttempts } from "../controllers/student-controllers";
 
+
+const router = Router();
 ////////////////        ATTEMPT QUIZ        /////////////////
 
-router.patch("/quiz/attempt", requireAuth, async (req, res) => {
-  const { quizId, studentId, score } = req.body;
-
-  if (req.user.userType !== "teacher" && req.user.userType !== "admin") {
-    return res.status(422).send({ error: "Access Denied" });
-  }
-
-  try {
-    const result = await Quiz.updateOne(
-      { _id: quizId },
-      { $push: { attemptedBy: { student: studentId, score: score } } },
-      { new: true }
-    );
-    res.send(result);
-  } catch (err) {
-    console.log(err);
-    return res.status(422).json({ error: err.message });
-  }
-});
+router.patch("/quiz/attempt", requiresAuth, quizAttempts);
 
 // module.exports = router;
 
